@@ -1,77 +1,113 @@
-// components/DonutChart.js
+"use client";
+import React from "react";
 import { Doughnut } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-
-ChartJS.register(ArcElement, Tooltip, Legend);
-
-const DonutChart = ({ cutout = "70%" }) => {
-  // No need for width and height props here
-  // Data values for each category
-  const values = [5000000, 5000000, 5000000, 5000000, 5000000];
-  // Calculate percentages based on equal distribution
-  const total = values.reduce((acc, value) => acc + value, 0);
-  const percentages = values.map((value) => ((value / total) * 100).toFixed(2));
-
-  // Data configuration
+import "chart.js/auto";
+ 
+export const ExpenseGraphic = () => {
   const data = {
-    labels: [
-      `Bills - ₮5,000,000 (${percentages[0]}%)`,
-      `Food - ₮5,000,000 (${percentages[1]}%)`,
-      `Shopping - ₮5,000,000 (${percentages[2]}%)`,
-      `Insurance - ₮5,000,000 (${percentages[3]}%)`,
-      `Clothing - ₮5,000,000 (${percentages[4]}%)`,
-    ],
+    labels: ["Bills", "Food", "Shopping", "Insurance", "Clothing"],
     datasets: [
       {
-        data: values,
+        label: "Income - Expense",
+        data: [220000, 500000, 100000, 200000, 300000],
         backgroundColor: [
-          "#2B65EC",
-          "#FF69B4",
-          "#F4A460",
-          "#20B2AA",
-          "#FF8C00",
+          "#3366CC",
+          "#FF6666",
+          "#FFCC99",
+          "#66CCCC",
+          "#FF9966",
         ],
-        hoverBackgroundColor: [
-          "#1F4CAD",
-          "#FF4977",
-          "#D9875C",
-          "#1B8A83",
-          "#CC7000",
-        ],
+        hoverOffset: 4,
+        borderColor: "#fff",
+        borderWidth: 2,
+        cutout: "60%",
       },
     ],
   };
-
-  // Chart options
+ 
   const options = {
-    responsive: true,
-    cutout: cutout, // This controls the cutout size
     plugins: {
       legend: {
-        position: "right",
-      },
-      tooltip: {
-        callbacks: {
-          label: function (context) {
-            const label = context.label || "";
-            const value = context.raw;
-            const percentage = ((value / total) * 100).toFixed(2);
-            return `${label}: ₩${value.toLocaleString()} (${percentage}%)`;
-          },
-        },
+        display: false,
       },
     },
   };
-
+ 
   return (
-    <Doughnut
-      data={data}
-      options={options}
-      width={600} // Set width to 600
-      height={200} // Set height to 200
-      style={{ width: "600px", height: "200px" }} // Ensure styles match the dimensions
-    />
+    <div
+      style={{
+        backgroundColor: "#fff",
+        padding: "20px",
+        borderRadius: "12px",
+        boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+        width: "50%",
+        // margin: "auto",
+      }}
+    >
+      <h3 style={{ marginBottom: "10px", textAlign: "center" }}>
+        Income - Expense
+      </h3>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
+        <div style={{ width: "40%" }}>
+          <Doughnut data={data} options={options} />
+        </div>
+ 
+        <div
+          style={{
+            width: "50%",
+            marginLeft: "20px",
+          }}
+        >
+          <table
+            style={{
+              width: "100%",
+              textAlign: "left",
+              borderCollapse: "collapse",
+            }}
+          >
+            <tbody>
+              {data.labels.map((label, index) => (
+                <tr key={index} style={{ height: "40px" }}>
+                  <td
+                    style={{
+                      color: data.datasets[0].backgroundColor[index],
+                      paddingLeft: "10px",
+                      width: "30%",
+                    }}
+                  >
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: "10px",
+                        height: "10px",
+                        backgroundColor:
+                          data.datasets[0].backgroundColor[index],
+                        borderRadius: "50%",
+                        marginRight: "10px",
+                      }}
+                    />
+                    {label}
+                  </td>
+                  <td style={{ textAlign: "right", width: "35%" }}>
+                    {data.datasets[0].data[index].toLocaleString()}$
+                  </td>
+                  <td style={{ textAlign: "right", width: "15%" }}></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p style={{ textAlign: "right", marginTop: "10px", color: "#666" }}>
+            Jun 1 - Nov 30
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
-
-export default DonutChart;
