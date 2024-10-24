@@ -1,7 +1,10 @@
+"use client";
+
 import React from "react";
 import ExpenseLogo from "../../../public/assets/ExpenseLogo";
 import Link from "next/link";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import AddRecordModal from "@/components/login/AddRecordModal";
 
 const RecordsPage = () => {
   return (
@@ -18,9 +21,24 @@ const RecordsPage = () => {
             <div>Records</div>
           </div>
           <div className="flex items-center gap-4">
-            <button className="btn btn-primary rounded-s-full rounded-e-full btn-sm">
+            <button
+              onClick={() => document.getElementById("my_modal_3").showModal()}
+              className="btn btn-primary rounded-s-full rounded-e-full btn-sm"
+            >
               Add Record
             </button>
+
+            <dialog id="my_modal_3" className="modal">
+              <div className="modal-box">
+                <form method="dialog">
+                  {/* if there is a button in form, it will close the modal */}
+                  <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+                    ✕
+                  </button>
+                </form>
+                <AddRecordModal />
+              </div>
+            </dialog>
             <div className="avatar">
               <div className="w-14 rounded-full">
                 <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />

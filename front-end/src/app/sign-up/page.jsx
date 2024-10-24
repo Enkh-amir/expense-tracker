@@ -2,31 +2,61 @@
 
 import Link from "next/link";
 import LoginLogo from "../../components/login/LoginLogo";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 const SignUp = () => {
-  const BACKEND_ENDPOINT = "https://the-boys-14.onrender.com/sign-up";
+  const [errorMessage, setErrorMessage] = useState("");
+  const router = useRouter();
 
-  const handleOnSubmit = async (event) => {
-    event.preventDefault();
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    validationSchema: Yup.object({
+      name: Yup.string().required("Required"),
+      email: Yup.string().email("Invalid email address").required("Required"),
+      password: Yup.string()
+        .min(6, "Password must be at least 6 characters")
+        .required("Required"),
+      confirmPassword: Yup.string()
+        .oneOf([Yup.ref("password"), null], "Passwords must match")
+        .required("Please confirm your password"),
+    }),
+    onSubmit: async (values) => {
+      setErrorMessage("");
+      try {
+        const response = await fetch("http://localhost:3001/sign-up", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          router.push("/");
+        } else {
+          setErrorMessage(data.message || "An error occurred");
+        }
+      } catch (error) {
+        setErrorMessage("Network Error");
+      }
+    },
+  });
 
-    const userData = {
-      name: event.target.name.value,
-      password: event.target.password.value,
-      email: event.target.email.value,
-    };
-
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    };
-
-    const response = await fetch(BACKEND_ENDPOINT, options);
-    const data = await response.json();
-    console.log(data);
-  };
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    if (isLoggedIn) {
+      // Add your toast here (e.g., toast.success)
+      router.push("/dashboard");
+    }
+  }, [router]);
 
   return (
     <div className="w-full flex justify-center h-screen">
@@ -46,35 +76,65 @@ const SignUp = () => {
               </p>
             </div>
           </div>
-          <form onSubmit={handleOnSubmit} className="flex flex-col gap-4">
+          <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
             <input
-              type="name"
+              id="name"
+              type="text"
               name="name"
               placeholder="Name"
-              className="input w-full border bg-[#F3F4F6] rounded-lg h-[48px] pl-5"
+              className="input input-bordered w-full"
+              onChange={formik.handleChange}
+              value={formik.values.name}
             />
+            {formik.errors.name ? (
+              <div className="text-red-600">{formik.errors.name}</div>
+            ) : null}
             <input
+              id="email"
               name="email"
               type="email"
               placeholder="E-mail"
-              className="input w-full border bg-[#F3F4F6] rounded-lg h-[48px] pl-5"
+              className="input input-bordered w-full"
+              onChange={formik.handleChange}
+              value={formik.values.email}
             />
+            {formik.errors.email ? (
+              <div className="text-red-600">{formik.errors.email}</div>
+            ) : null}
             <input
+              id="password"
               name="password"
               type="password"
               placeholder="Password"
-              className="input w-full border bg-[#F3F4F6] rounded-lg h-[48px] pl-5"
+              className="input input-bordered w-full"
+              onChange={formik.handleChange}
+              value={formik.values.password}
             />
+            {formik.errors.password ? (
+              <div className="text-red-600">{formik.errors.password}</div>
+            ) : null}
             <input
               type="password"
+              id="confirmPassword"
+              name="confirmPassword"
               placeholder="Re-Password"
-              className="input w-full border bg-[#F3F4F6] rounded-lg h-[48px] pl-5"
+              className="input input-bordered w-full"
+              onChange={formik.handleChange}
+              value={formik.values.confirmPassword}
             />
-            <button className="w-full border bg-[#0166FF] text-white rounded-2xl h-[48px] pl-5 text-[20px]">
+            {formik.errors.confirmPassword ? (
+              <div className="text-red-600">
+                {formik.errors.confirmPassword}
+              </div>
+            ) : null}
+            <button
+              type="submit"
+              className="w-full border bg-[#0166FF] text-white rounded-2xl h-[48px] pl-5 text-[20px]"
+            >
               Sign up
             </button>
             <div className="flex justify-center gap-3 mt-8 text-base">
-              <p className=" text-[#0F172A]">Already have account?</p>
+              <p className="">Already have an account?</p>
               <Link href={"/"}>
                 <button className="text-[#0166FF]">Log in</button>
               </Link>
@@ -86,4 +146,5 @@ const SignUp = () => {
     </div>
   );
 };
+
 export default SignUp;
