@@ -51,7 +51,12 @@ const RecordsPage = () => {
         <div className="card w-72 bg-base-200 border-[1px] h-max border-base-300 py-5 px-3 gap-5">
           <div className="text-2xl font-semibold ">Records</div>
           <div className="flex flex-col gap-4">
-            <button className="btn btn-primary w-full h-8 min-h-8">add</button>
+            <button
+              onClick={() => document.getElementById("my_modal_3").showModal()}
+              className="btn btn-primary w-full h-8 min-h-8"
+            >
+              add
+            </button>
             <label className="input input-bordered flex items-center gap-2 h-8 min-h-8">
               <input type="text" className="grow" placeholder="Search" />
               <svg
@@ -114,6 +119,46 @@ const RecordsPage = () => {
                 <i className="fa-solid fa-eye"></i>
               </label>
             </div>
+            <button
+              className="btn btn-primary min-h-4 h-8 w-full"
+              onClick={() => document.getElementById("my_modal_5").showModal()}
+            >
+              + Add Category
+            </button>
+            <dialog id="my_modal_5" className="modal">
+              <div className="modal-box">
+                <form method="dialog">
+                  <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+                    ✕
+                  </button>
+                  <h3 className="font-bold text-lg">Add Category</h3>
+                  <div className="divider"></div>
+                  <div className="flex justify-between">
+                    <select className="select select-bordered w-24">
+                      <option>Home</option>
+                      <option>Han Solo</option>
+                      <option>Greedo</option>
+                    </select>
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      className="input input-bordered w-full max-w-[350px]"
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Description"
+                    className="input input-bordered w-full mt-4"
+                  />
+                  <button
+                    type="submit"
+                    className="btn btn-success w-full min-h-5 h-9 mt-6 "
+                  >
+                    Add
+                  </button>
+                </form>
+              </div>
+            </dialog>
           </div>
         </div>
         <div className="w-[75%] flex flex-col gap-5">

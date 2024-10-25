@@ -30,13 +30,14 @@ const SignUp = () => {
     }),
     onSubmit: async (values) => {
       setErrorMessage("");
+      const { confirmPassword, ...filteredValues } = values; // Exclude confirmPassword
       try {
-        const response = await fetch("http://localhost:3001/sign-up", {
+        const response = await fetch("http://localhost:8888/sign-up", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(values),
+          body: JSON.stringify(filteredValues),
         });
         const data = await response.json();
         if (response.ok) {
@@ -53,7 +54,6 @@ const SignUp = () => {
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     if (isLoggedIn) {
-      // Add your toast here (e.g., toast.success)
       router.push("/dashboard");
     }
   }, [router]);
@@ -76,7 +76,9 @@ const SignUp = () => {
               </p>
             </div>
           </div>
+
           <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
+            {/* Name field */}
             <input
               id="name"
               type="text"
@@ -84,11 +86,14 @@ const SignUp = () => {
               placeholder="Name"
               className="input input-bordered w-full"
               onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               value={formik.values.name}
             />
-            {formik.errors.name ? (
+            {formik.touched.name && formik.errors.name ? (
               <div className="text-red-600">{formik.errors.name}</div>
             ) : null}
+
+            {/* Email field */}
             <input
               id="email"
               name="email"
@@ -96,11 +101,14 @@ const SignUp = () => {
               placeholder="E-mail"
               className="input input-bordered w-full"
               onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               value={formik.values.email}
             />
-            {formik.errors.email ? (
+            {formik.touched.email && formik.errors.email ? (
               <div className="text-red-600">{formik.errors.email}</div>
             ) : null}
+
+            {/* Password field */}
             <input
               id="password"
               name="password"
@@ -108,11 +116,14 @@ const SignUp = () => {
               placeholder="Password"
               className="input input-bordered w-full"
               onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               value={formik.values.password}
             />
-            {formik.errors.password ? (
+            {formik.touched.password && formik.errors.password ? (
               <div className="text-red-600">{formik.errors.password}</div>
             ) : null}
+
+            {/* Confirm Password field */}
             <input
               type="password"
               id="confirmPassword"
@@ -120,25 +131,35 @@ const SignUp = () => {
               placeholder="Re-Password"
               className="input input-bordered w-full"
               onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               value={formik.values.confirmPassword}
             />
-            {formik.errors.confirmPassword ? (
+            {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
               <div className="text-red-600">
                 {formik.errors.confirmPassword}
               </div>
             ) : null}
+
+            {/* Sign-up Button */}
             <button
               type="submit"
               className="w-full border bg-[#0166FF] text-white rounded-2xl h-[48px] pl-5 text-[20px]"
             >
               Sign up
             </button>
+
+            {/* Redirect to Login */}
             <div className="flex justify-center gap-3 mt-8 text-base">
-              <p className="">Already have an account?</p>
+              <p>Already have an account?</p>
               <Link href={"/"}>
                 <button className="text-[#0166FF]">Log in</button>
               </Link>
             </div>
+
+            {/* Display error message if any */}
+            {errorMessage && (
+              <div className="text-red-600 mt-4">{errorMessage}</div>
+            )}
           </form>
         </div>
       </div>

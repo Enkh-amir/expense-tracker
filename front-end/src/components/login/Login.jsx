@@ -25,7 +25,7 @@ const Login = () => {
     onSubmit: async (values) => {
       setErrorMessage("");
       try {
-        const response = await fetch("http://localhost:3030/login", {
+        const response = await fetch("http://localhost:8888", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -35,7 +35,7 @@ const Login = () => {
 
         const data = await response.json();
         console.log("email", email.value);
-        console.log("pass", password);
+        console.log("pass", password.value);
         console.log("data", data);
 
         if (response.ok) {
