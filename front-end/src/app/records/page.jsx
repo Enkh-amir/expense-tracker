@@ -1,12 +1,73 @@
 "use client";
 
-import React from "react";
+import React, { use, useEffect, useState } from "react";
 import ExpenseLogo from "../../../public/assets/ExpenseLogo";
 import Link from "next/link";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import AddRecordModal from "@/components/login/AddRecordModal";
 
 const RecordsPage = () => {
+  const [categoryName, setCategoryName] = useState("");
+  const [icon, setIcon] = useState("");
+  const [description, setDescription] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [records, setRecords] = useState([]);
+
+  const fetchRecords = async () => {
+    try {
+      const respone = await fetch(`http://localhost:8888/records`);
+      const responseData = await respone.json();
+      setRecords(responseData.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const respone = await fetch(`http://localhost:8888/categories`);
+      const responseData = await respone.json();
+      setCategories(responseData.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleForSubmit = async (e) => {
+    e.preventDefault();
+    const newCategory = {
+      name: categoryName,
+      description: description,
+      category_icon: icon,
+    };
+
+    try {
+      const response = await fetch("http://localhost:8888/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newCategory),
+      });
+      console.log(newCategory);
+      if (response.ok) {
+        // Reset fields after successful submission
+        setCategoryName("");
+        setIcon("");
+        setDescription("");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, [categories]);
+
+  useEffect(() => {
+    fetchRecords();
+  }, [records]);
+
+
   return (
     <div className="flex justify-center flex-col items-center gap-5 ">
       <header className="flex w-full py-4 justify-center bg-base-200">
@@ -30,12 +91,6 @@ const RecordsPage = () => {
 
             <dialog id="my_modal_3" className="modal">
               <div className="modal-box">
-                <form method="dialog">
-                  {/* if there is a button in form, it will close the modal */}
-                  <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-                    ✕
-                  </button>
-                </form>
                 <AddRecordModal />
               </div>
             </dialog>
@@ -102,22 +157,14 @@ const RecordsPage = () => {
                 <span className="label-text">All</span>
                 <i className="fa-solid fa-eye"></i>
               </label>
-              <label className="label">
-                <span className="label-text">Income</span>
-                <i className="fa-solid fa-eye"></i>
-              </label>
-              <label className="label">
-                <span className="label-text">Expense</span>
-                <i className="fa-solid fa-eye"></i>
-              </label>
-              <label className="label">
-                <span className="label-text">Expense</span>
-                <i className="fa-solid fa-eye"></i>
-              </label>
-              <label className="label">
-                <span className="label-text">Expense</span>
-                <i className="fa-solid fa-eye"></i>
-              </label>
+              {categories?.map((category, index) => {
+                return (
+                  <label className="label" key={index}>
+                    <span className="label-text">{category.name}</span>
+                    <i className="fa-solid fa-eye"></i>
+                  </label>
+                );
+              })}
             </div>
             <button
               className="btn btn-primary min-h-4 h-8 w-full"
@@ -127,25 +174,45 @@ const RecordsPage = () => {
             </button>
             <dialog id="my_modal_5" className="modal">
               <div className="modal-box">
-                <form method="dialog">
-                  <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+                <form method="dialog" onSubmit={handleForSubmit}>
+                  <button
+                    onClick={() =>
+                      document.getElementById("my_modal_5").close()
+                    }
+                    type="button"
+                    className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                  >
                     ✕
                   </button>
                   <h3 className="font-bold text-lg">Add Category</h3>
                   <div className="divider"></div>
                   <div className="flex justify-between">
-                    <select className="select select-bordered w-24">
-                      <option>Home</option>
-                      <option>Han Solo</option>
-                      <option>Greedo</option>
+                    <select
+                      value={icon}
+                      onChange={(e) => setIcon(e.target.value)}
+                      className="select select-bordered w-24"
+                    >
+                      <option value={"🏠"}>🏠</option>
+                      <option value={"🥘"}>🥘</option>
+                      <option value={"🚗"}>🚗</option>
+                      <option value={"🐈"}>🐈</option>
                     </select>
+
                     <input
+                      value={categoryName}
+                      onChange={(e) => {
+                        setCategoryName(e.target.value);
+                      }}
                       type="text"
                       placeholder="Name"
                       className="input input-bordered w-full max-w-[350px]"
                     />
                   </div>
                   <input
+                    value={description}
+                    onChange={(e) => {
+                      setDescription(e.target.value);
+                    }}
                     type="text"
                     placeholder="Description"
                     className="input input-bordered w-full mt-4"
@@ -153,6 +220,9 @@ const RecordsPage = () => {
                   <button
                     type="submit"
                     className="btn btn-success w-full min-h-5 h-9 mt-6 "
+                    onClick={() =>
+                      document.getElementById("my_modal_5").close()
+                    }
                   >
                     Add
                   </button>
@@ -192,13 +262,20 @@ const RecordsPage = () => {
           </div>
           <div className="w-full flex flex-col gap-3">
             <div>Today</div>
-            <div className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between">
-              <div className="flex items-center gap-3">
-                <i className="fa-solid fa-house"></i>
-                <div>Electricity</div>
-              </div>
-              <div>+1000</div>
-            </div>
+            {records.map((record, index) => {
+              return (
+                <div
+                  key={index}
+                  className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <i className="fa-solid fa-house"></i>
+                    <div>{record.name}</div>
+                  </div>
+                  <div>{record.amount}</div>
+                </div>
+              );
+            })}
           </div>
           <div className="w-full flex flex-col gap-3">
             <div>
