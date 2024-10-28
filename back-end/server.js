@@ -58,25 +58,66 @@ app.post("/", async (req, res) => {
 });
 
 app.post("/records", async (req, res) => {
-  const { name, description ,category_icon } = req.body;
+  const { name, user_id, amount, transaction_type, description, category_id } =
+    req.body;
+
 
   try {
-    const existingUser =
-      await sql`SELECT * FROM "users" WHERE email = ${email}`;
-    if (existingUser.length > 0) {
-      return res.status(400).json({ message: "User already exists" });
-    }
+    console.log("Received data:", req.body);
 
-    const newUser = await sql`
-        INSERT INTO users (name, email, password) 
-        VALUES (${name}, ${email}, ${password})
-        RETURNING id, email`;
+    const newRecord = await sql`
+      INSERT INTO records (name, user_id, amount, transaction_type, description, category_id) 
+      VALUES (${name}, ${user_id}, ${amount}, ${transaction_type}, ${description}, ${category_id})
+      RETURNING *;
+    `;
 
-    res
-      .status(201)
-      .json({ message: "user created successfully", user: newUser[0] });
+    res.status(201).json({
+      message: "Record created successfully",
+      record: newRecord[0],
+    });
   } catch (error) {
-    res.status(201).json({ message: "Internal server error creating user" });
+    console.error("Error creating record:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+});
+
+app.get("/records", async (_, response) => {
+  try {
+    const sqlResponse = await sql`SELECT * FROM records;`;
+    response.json({ data: sqlResponse, success: true });
+  } catch (error) {
+    response.json({ error: error, success: false });
+  }
+});
+
+app.post("/categories", async (req, res) => {
+  const { name, description, category_icon, icon_color } = req.body;
+
+  try {
+    const newCategory = await sql`
+      INSERT INTO categories (name, description, category_icon, icon_color) 
+      VALUES (${name}, ${description}, ${category_icon}, ${icon_color})
+      RETURNING *;
+    `;
+
+    res.status(201).json({
+      message: "Category created successfully",
+      category: newCategory[0],
+    });
+  } catch (error) {
+    console.error("Error creating category:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get("/categories", async (_, response) => {
+  try {
+    const sqlResponse = await sql`SELECT * FROM categories;`;
+    response.json({ data: sqlResponse, success: true });
+  } catch (error) {
+    response.json({ error: error, success: false });
   }
 });
 
