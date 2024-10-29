@@ -61,13 +61,12 @@ app.post("/records", async (req, res) => {
   const { name, user_id, amount, transaction_type, description, category_id } =
     req.body;
 
-
   try {
     console.log("Received data:", req.body);
 
     const newRecord = await sql`
-      INSERT INTO records (name, user_id, amount, transaction_type, description, category_id) 
-      VALUES (${name}, ${user_id}, ${amount}, ${transaction_type}, ${description}, ${category_id})
+      INSERT INTO records (name, user_id, amount, transaction_type, category_id, description) 
+      VALUES (${name}, ${user_id}, ${amount}, ${transaction_type}, ${category_id}, ${description})
       RETURNING *;
     `;
 
