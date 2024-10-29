@@ -67,7 +67,6 @@ const RecordsPage = () => {
     fetchRecords();
   }, [records]);
 
-
   return (
     <div className="flex justify-center flex-col items-center gap-5 ">
       <header className="flex w-full py-4 justify-center bg-base-200">
@@ -91,7 +90,7 @@ const RecordsPage = () => {
 
             <dialog id="my_modal_3" className="modal">
               <div className="modal-box">
-                <AddRecordModal />
+                <AddRecordModal categories={categories} />
               </div>
             </dialog>
             <div className="avatar">
@@ -269,10 +268,32 @@ const RecordsPage = () => {
                   className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
-                    <i className="fa-solid fa-house"></i>
-                    <div>{record.name}</div>
+                    <div>
+                      {categories.map((category) => {
+                        if (category.id === record.category_id) {
+                          return (
+                            <span key={category.id}>
+                              {category.category_icon}
+                            </span>
+                          );
+                        }
+                        return null;
+                      })}
+                    </div>
+                    <div>{record.description}</div>
                   </div>
-                  <div>{record.amount}</div>
+
+                  <div
+                    className={`${
+                      record.transaction_type == "EXP"
+                        ? "text-error"
+                        : "text-success"
+                    }`}
+                  >
+                    {" "}
+                    {record.transaction_type == "EXP" ? "-" : "+"}
+                    {record.amount}
+                  </div>
                 </div>
               );
             })}

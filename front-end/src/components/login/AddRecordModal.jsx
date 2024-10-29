@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BACKEND_ENDPOINT } from "@/constants/constant";
 
-const AddRecordModal = () => {
+const AddRecordModal = ({ categories }) => {
   const [transactionType, setTransactionType] = useState("EXP");
   const [records, setRecords] = useState({
     name: "",
@@ -52,7 +52,9 @@ const AddRecordModal = () => {
         body: JSON.stringify(records),
       });
 
-      if (!response.ok) console.log("error");
+      if (!response.ok) {
+        console.log("error");
+      }
 
       const data = await response.json();
       console.log("Record added successfully:", data);
@@ -62,7 +64,7 @@ const AddRecordModal = () => {
         transaction_type: transactionType,
         category_id: "",
         description: "",
-        createdat: new Date().toISOString(), // Reset to current time after submit
+        createdat: new Date().toISOString(),
       });
     } catch (error) {
       console.error("Error adding record:", error);
@@ -84,6 +86,7 @@ const AddRecordModal = () => {
         {/* Transaction Type Buttons */}
         <div className="flex justify-between mb-4">
           <button
+            type="button"
             className={`w-1/2 py-2 text-center font-semibold rounded-l-lg ${
               transactionType === "EXP"
                 ? "bg-info text-white"
@@ -94,6 +97,7 @@ const AddRecordModal = () => {
             Expense
           </button>
           <button
+            type="button"
             className={`w-1/2 py-2 text-center font-semibold rounded-r-lg ${
               transactionType === "INC"
                 ? "bg-success text-white"
@@ -127,11 +131,15 @@ const AddRecordModal = () => {
             onChange={handleInputChange}
             className="select select-bordered w-full"
           >
-            <option disabled>Who shot first?</option>
-            <option value={"ddb49410-7646-46cd-9dbe-56fadb7a9a8c"}>hool</option>
-            <option value={"67facf23-3dea-4a17-a33c-3c59041e7e79"}>
-              minii muur
+            <option disabled value="">
+              Select a category
             </option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.category_icon}
+                {category.name}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -150,7 +158,7 @@ const AddRecordModal = () => {
             <label className="block">Time</label>
             <input
               type="time"
-              value={records.createdat.split("T")[1].split(".")[0] || ""} // Get only the time part without milliseconds
+              value={records.createdat.split("T")[1].split(".")[0] || ""}
               onChange={handleTimeChange}
               className="input input-bordered w-full"
             />
@@ -189,6 +197,7 @@ const AddRecordModal = () => {
             transactionType === "EXP" ? "bg-blue-500" : "bg-green-500"
           }`}
           type="submit"
+          onClick={() => document.getElementById("my_modal_3").close()}
         >
           Add Record
         </button>
