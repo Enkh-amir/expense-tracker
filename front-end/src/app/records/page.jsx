@@ -12,6 +12,7 @@ const RecordsPage = () => {
   const [description, setDescription] = useState("");
   const [categories, setCategories] = useState([]);
   const [records, setRecords] = useState([]);
+  const [tranType, setTranType] = useState("all");
 
   const fetchRecords = async () => {
     try {
@@ -32,6 +33,11 @@ const RecordsPage = () => {
       console.log(error);
     }
   };
+
+  const filteredRecords = records.filter((record) => {
+    if (tranType === "all") return true;
+    return record.transaction_type === tranType;
+  });
 
   const handleForSubmit = async (e) => {
     e.preventDefault();
@@ -101,6 +107,11 @@ const RecordsPage = () => {
           </div>
         </div>
       </header>
+
+      {/* ///////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////////////// */}
+
       <main className="w-[55vw] flex gap-5">
         <div className="card w-72 bg-base-200 border-[1px] h-max border-base-300 py-5 px-3 gap-5">
           <div className="text-2xl font-semibold ">Records</div>
@@ -133,18 +144,35 @@ const RecordsPage = () => {
               <label className="label cursor-pointer">
                 <span className="label-text">All</span>
                 <input
-                  type="checkbox"
-                  defaultChecked
-                  className="checkbox checkbox-primary"
+                  value="all"
+                  type="radio"
+                  name="radio-1"
+                  className="radio"
+                  checked={tranType === "all"}
+                  onChange={(e) => setTranType(e.target.value)}
                 />
               </label>
               <label className="label cursor-pointer">
                 <span className="label-text">Income</span>
-                <input type="checkbox" className="checkbox checkbox-primary" />
+                <input
+                  value="INC"
+                  type="radio"
+                  name="radio-1"
+                  className="radio"
+                  checked={tranType === "INC"}
+                  onChange={(e) => setTranType(e.target.value)}
+                />
               </label>
               <label className="label cursor-pointer">
                 <span className="label-text">Expense</span>
-                <input type="checkbox" className="checkbox checkbox-primary" />
+                <input
+                  value="EXP"
+                  type="radio"
+                  name="radio-1"
+                  className="radio"
+                  checked={tranType === "EXP"}
+                  onChange={(e) => setTranType(e.target.value)}
+                />
               </label>
             </div>
             <div className="flex w-full justify-between">
@@ -195,6 +223,15 @@ const RecordsPage = () => {
                       <option value={"🥘"}>🥘</option>
                       <option value={"🚗"}>🚗</option>
                       <option value={"🐈"}>🐈</option>
+                      <option value={"💊"}>💊</option>
+                      <option value={"🏥"}>🏥</option>
+                      <option value={"🍻"}>🍻</option>
+                      <option value={"🎲"}>🎲</option>
+                      <option value={"🧒"}>🧒</option>
+                      <option value={"🧳"}>🧳</option>
+                      <option value={"✈️"}>✈️</option>
+                      <option value={"🥤"}>🥤</option>
+                      <option value={"🍭"}>🍭</option>
                     </select>
 
                     <input
@@ -261,7 +298,7 @@ const RecordsPage = () => {
           </div>
           <div className="w-full flex flex-col gap-3">
             <div>Today</div>
-            {records.map((record, index) => {
+            {filteredRecords.map((record, index) => {
               return (
                 <div
                   key={index}
