@@ -182,13 +182,22 @@ const RecordsPage = () => {
             <div className="form-control ml-2">
               <label className="label">
                 <span className="label-text">All</span>
-                <i className="fa-solid fa-eye"></i>
+                <input
+                  type="checkbox"
+                  defaultChecked
+                  className="checkbox checkbox-sm"
+                />
               </label>
               {categories?.map((category, index) => {
                 return (
                   <label className="label" key={index}>
                     <span className="label-text">{category.name}</span>
-                    <i className="fa-solid fa-eye"></i>
+
+                    <input
+                      type="checkbox"
+                      defaultChecked
+                      className="checkbox checkbox-sm"
+                    />
                   </label>
                 );
               })}
