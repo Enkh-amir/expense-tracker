@@ -13,11 +13,30 @@ const RecordsPage = () => {
   const [categories, setCategories] = useState([]);
   const [records, setRecords] = useState([]);
   const [tranType, setTranType] = useState("all");
+  const [cateType, setCateType] = useState([]);
+
+  const addCategory = (category) => {
+    if (!cateType.includes(category)) {
+      setCateType((prevCateType) => [...prevCateType, category]);
+    }
+  };
 
   const fetchRecords = async () => {
     try {
-      const respone = await fetch(`http://localhost:8888/records`);
-      const responseData = await respone.json();
+      let url;
+
+      if (tranType !== "all" && cateType.length > 0) {
+        url = `http://localhost:8888/records/${tranType}/${cateType}`;
+      } else if (tranType !== "all") {
+        url = `http://localhost:8888/records/${tranType}`;
+      } else if (cateType.length > 0) {
+        url = `http://localhost:8888/records/category/${cateType}`;
+      } else {
+        url = `http://localhost:8888/records`;
+      }
+
+      const response = await fetch(url);
+      const responseData = await response.json();
       setRecords(responseData.data);
     } catch (error) {
       console.log(error);
@@ -34,10 +53,13 @@ const RecordsPage = () => {
     }
   };
 
-  const filteredRecords = records.filter((record) => {
-    if (tranType === "all") return true;
-    return record.transaction_type === tranType;
-  });
+  // const filteredRecords = records.filter((record) => {
+  //   if (tranType === "all") return true;
+  //   return (
+  //     record.transaction_type === tranType &&
+  //     (record.category_id == cateType || cateType == "all")
+  //   );
+  // });
 
   const handleForSubmit = async (e) => {
     e.preventDefault();
@@ -67,11 +89,13 @@ const RecordsPage = () => {
 
   useEffect(() => {
     fetchCategories();
-  }, [categories]);
+  }, []);
 
   useEffect(() => {
     fetchRecords();
-  }, [records]);
+  }, [tranType, cateType]);
+
+  console.log(cateType);
 
   return (
     <div className="flex justify-center flex-col items-center gap-5 ">
@@ -180,22 +204,16 @@ const RecordsPage = () => {
               <button className="text-base-content">Clear</button>
             </div>
             <div className="form-control ml-2">
-              <label className="label">
-                <span className="label-text">All</span>
-                <input
-                  type="checkbox"
-                  defaultChecked
-                  className="checkbox checkbox-sm"
-                />
-              </label>
               {categories?.map((category, index) => {
                 return (
                   <label className="label" key={index}>
                     <span className="label-text">{category.name}</span>
 
                     <input
+                      onChange={() => {
+                        () => addCategory(`'${category.id}'`);
+                      }}
                       type="checkbox"
-                      defaultChecked
                       className="checkbox checkbox-sm"
                     />
                   </label>
@@ -228,6 +246,9 @@ const RecordsPage = () => {
                       onChange={(e) => setIcon(e.target.value)}
                       className="select select-bordered w-24"
                     >
+                      <option disabled value="">
+                        select icon
+                      </option>
                       <option value={"🏠"}>🏠</option>
                       <option value={"🥘"}>🥘</option>
                       <option value={"🚗"}>🚗</option>
@@ -307,7 +328,7 @@ const RecordsPage = () => {
           </div>
           <div className="w-full flex flex-col gap-3">
             <div>Today</div>
-            {filteredRecords.map((record, index) => {
+            {records?.map((record, index) => {
               return (
                 <div
                   key={index}
