@@ -15,25 +15,33 @@ const RecordsPage = () => {
   const [tranType, setTranType] = useState("all");
   const [cateType, setCateType] = useState([]);
 
-  const addCategory = (category) => {
-    if (!cateType.includes(category)) {
-      setCateType((prevCateType) => [...prevCateType, category]);
+  const toggleCheckbox = (event) => {
+    const value = event.target.value;
+    if (event.target.checked) {
+      // Add value to the array if checked
+      setCateType((prev) => [...prev, value]);
+    } else {
+      // Remove value from the array if unchecked
+      setCateType((prev) => prev.filter((item) => item !== value));
     }
   };
 
   const fetchRecords = async () => {
     try {
-      let url;
+      let url = `http://localhost:8888/records?category=${JSON.stringify(
+        cateType
+      )}&type=${tranType}`;
+      console.log(url);
 
-      if (tranType !== "all" && cateType.length > 0) {
-        url = `http://localhost:8888/records/${tranType}/${cateType}`;
-      } else if (tranType !== "all") {
-        url = `http://localhost:8888/records/${tranType}`;
-      } else if (cateType.length > 0) {
-        url = `http://localhost:8888/records/category/${cateType}`;
-      } else {
-        url = `http://localhost:8888/records`;
-      }
+      // if (tranType !== "all" && cateType.length > 0) {
+      //   url = `http://localhost:8888/records/${tranType}/${cateType}`;
+      // } else if (tranType !== "all") {
+      //   url = `http://localhost:8888/records/${tranType}`;
+      // } else if (cateType.length > 0) {
+      //   url = `http://localhost:8888/records/category/${cateType}`;
+      // } else {
+      //   url = `http://localhost:8888/records`;
+      // }
 
       const response = await fetch(url);
       const responseData = await response.json();
@@ -94,8 +102,6 @@ const RecordsPage = () => {
   useEffect(() => {
     fetchRecords();
   }, [tranType, cateType]);
-
-  console.log(cateType);
 
   return (
     <div className="flex justify-center flex-col items-center gap-5 ">
@@ -210,9 +216,8 @@ const RecordsPage = () => {
                     <span className="label-text">{category.name}</span>
 
                     <input
-                      onChange={() => {
-                        () => addCategory(`'${category.id}'`);
-                      }}
+                      value={category.id}
+                      onChange={toggleCheckbox}
                       type="checkbox"
                       className="checkbox checkbox-sm"
                     />
