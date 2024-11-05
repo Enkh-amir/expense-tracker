@@ -1,4 +1,4 @@
-import express from "express";
+import express, { json } from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -83,44 +83,28 @@ app.post("/records", async (req, res) => {
 });
 
 app.get("/records", async (req, response) => {
-  try {
-    const sqlResponse = await sql`SELECT * FROM records;`;
-    response.json({ data: sqlResponse, success: true });
-  } catch (error) {
-    response.json({ error: error.message, success: false });
+  const { category, type } = req.query;
+
+  let sqlQuery;
+
+  if (type === "all" && category.length ) {
+    sqlQuery = sql`SELECT * FROM records`; // No WHERE clause needed
+  } else if (category !== "all" && type) {
+    sqlQuery = await sql`
+              SELECT * FROM records
+              WHERE transaction_type = ${type} AND category_id IN ${category};
+            `;
+  } else if (transaction_type) {
+    sqlQuery = await sql`
+            SELECT * FROM records
+            WHERE transaction_type = ${type};
+          `;
+  } else {
+    sqlQuery = sql`SELECT * FROM records WHERE transaction_type = ${type}`; // Include WHERE clause
   }
-});
-
-app.get("/records/:type", async (req, response) => {
-  const { type: transaction_type } = req.params;
-  try {
-    let sqlResponse;
-
-    if (transaction_type) {
-      sqlResponse = await sql`
-        SELECT * FROM records
-        WHERE transaction_type = ${transaction_type};
-      `;
-    } else {
-      sqlResponse = await sql`SELECT * FROM records;`;
-    }
-
-    response.json({ data: sqlResponse, success: true });
-  } catch (error) {
-    response.json({ error: error.message, success: false });
-  }
-});
-
-app.get("/records/category/:cateType", async (req, response) => {
-  const { cateType: category_id } = req.params;
 
   try {
-    let sqlResponse;
-
-    sqlResponse = await sql`
-        SELECT * FROM records
-        WHERE category_id IN (${category_id});
-      `;
+    const sqlResponse = await sqlQuery;
 
     response.json({ data: sqlResponse, success: true });
   } catch (error) {
@@ -128,25 +112,62 @@ app.get("/records/category/:cateType", async (req, response) => {
   }
 });
 
-app.get("/records/:type/:cateType", async (req, response) => {
-  const { type: transaction_type, cateType: category_id } = req.params;
-  try {
-    let sqlResponse;
+// app.get("/records/:type", async (req, response) => {
+//   const { type: transaction_type } = req.params;
+//   try {
+//     let sqlResponse;
 
-    if (transaction_type && category_id) {
-      sqlResponse = await sql`
-        SELECT * FROM records
-        WHERE transaction_type = ${transaction_type} AND category_id = ${category_id};
-      `;
-    } else {
-      sqlResponse = await sql`SELECT * FROM records;`;
-    }
+//     if (transaction_type) {
+//       sqlResponse = await sql`
+//         SELECT * FROM records
+//         WHERE transaction_type = ${transaction_type};
+//       `;
+//     } else {
+//       sqlResponse = await sql`SELECT * FROM records;`;
+//     }
 
-    response.json({ data: sqlResponse, success: true });
-  } catch (error) {
-    response.json({ error: error.message, success: false });
-  }
-});
+//     response.json({ data: sqlResponse, success: true });
+//   } catch (error) {
+//     response.json({ error: error.message, success: false });
+//   }
+// });
+
+// app.get("/records/category/:cateType", async (req, response) => {
+//   const { cateType: category_id } = req.params;
+
+//   try {
+//     let sqlResponse;
+
+//     sqlResponse = await sql`
+//         SELECT * FROM records
+//         WHERE category_id IN ${category_id};
+//       `;
+
+//     response.json({ data: sqlResponse, success: true });
+//   } catch (error) {
+//     response.json({ error: error.message, success: false, data: category_id });
+//   }
+// });
+
+// app.get("/records/:type/:cateType", async (req, response) => {
+//   const { type: transaction_type, cateType: category_id } = req.params;
+//   try {
+//     let sqlResponse;
+
+//     if (transaction_type && category_id) {
+//       sqlResponse = await sql`
+//         SELECT * FROM records
+//         WHERE transaction_type = ${transaction_type} AND category_id = ${category_id};
+//       `;
+//     } else {
+//       sqlResponse = await sql`SELECT * FROM records;`;
+//     }
+
+//     response.json({ data: sqlResponse, success: true });
+//   } catch (error) {
+//     response.json({ error: error.message, success: false });
+//   }
+// });
 
 app.post("/categories", async (req, res) => {
   const { name, description, category_icon, icon_color } = req.body;
