@@ -87,25 +87,31 @@ app.get("/records", async (req, response) => {
 
   let sqlQuery;
 
-  if (type === "all" && category.length ) {
-    sqlQuery = sql`SELECT * FROM records`; // No WHERE clause needed
-  } else if (category !== "all" && type) {
-    sqlQuery = await sql`
-              SELECT * FROM records
-              WHERE transaction_type = ${type} AND category_id IN ${category};
-            `;
-  } else if (transaction_type) {
-    sqlQuery = await sql`
-            SELECT * FROM records
-            WHERE transaction_type = ${type};
-          `;
-  } else {
-    sqlQuery = sql`SELECT * FROM records WHERE transaction_type = ${type}`; // Include WHERE clause
-  }
+  const categoryArray = category ? JSON.parse(category) : [];
+
+  console.log(`${categoryArray}`);
 
   try {
-    const sqlResponse = await sqlQuery;
+    if (type !== "all" && categoryArray.length > 0) {
+      sqlQuery = sql`
+        SELECT * FROM records
+        WHERE transaction_type = ${type} AND category_id IN (${categoryArray});
+      `;
+    } else if (type !== "all") {
+      sqlQuery = sql`
+        SELECT * FROM records
+        WHERE transaction_type = ${type};
+      `;
+    } else if (categoryArray.length > 0) {
+      sqlQuery = sql`
+        SELECT * FROM records
+        WHERE category_id IN (${categoryArray});
+      `;
+    } else {
+      sqlQuery = sql`SELECT * FROM records`;
+    }
 
+    const sqlResponse = await sqlQuery;
     response.json({ data: sqlResponse, success: true });
   } catch (error) {
     response.json({ error: error.message, success: false });
