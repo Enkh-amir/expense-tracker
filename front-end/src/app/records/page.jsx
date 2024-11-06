@@ -18,30 +18,21 @@ const RecordsPage = () => {
   const toggleCheckbox = (event) => {
     const value = event.target.value;
     if (event.target.checked) {
-      // Add value to the array if checked
       setCateType((prev) => [...prev, value]);
     } else {
-      // Remove value from the array if unchecked
       setCateType((prev) => prev.filter((item) => item !== value));
     }
   };
 
+  const formattedCateType = cateType.map((item) => `'${item}'`).join(", ");
+
   const fetchRecords = async () => {
     try {
       let url = `http://localhost:8888/records?category=${JSON.stringify(
-        cateType
+        formattedCateType
       )}&type=${tranType}`;
-      console.log(url);
 
-      // if (tranType !== "all" && cateType.length > 0) {
-      //   url = `http://localhost:8888/records/${tranType}/${cateType}`;
-      // } else if (tranType !== "all") {
-      //   url = `http://localhost:8888/records/${tranType}`;
-      // } else if (cateType.length > 0) {
-      //   url = `http://localhost:8888/records/category/${cateType}`;
-      // } else {
-      //   url = `http://localhost:8888/records`;
-      // }
+      console.log(url);
 
       const response = await fetch(url);
       const responseData = await response.json();
