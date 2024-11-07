@@ -24,15 +24,11 @@ const RecordsPage = () => {
     }
   };
 
-  const formattedCateType = cateType.map((item) => `'${item}'`).join(", ");
-
   const fetchRecords = async () => {
     try {
       let url = `http://localhost:8888/records?category=${JSON.stringify(
-        formattedCateType
+        cateType
       )}&type=${tranType}`;
-
-      console.log(url);
 
       const response = await fetch(url);
       const responseData = await response.json();
@@ -51,6 +47,16 @@ const RecordsPage = () => {
       console.log(error);
     }
   };
+
+  // Combined filtering of records based on both category and transaction type
+  const filteredRecords = records.filter((record) => {
+    const isCategoryMatch =
+      cateType.length === 0 || cateType.includes(record.category_id);
+    const isTransactionMatch =
+      tranType === "all" || record.transaction_type === tranType;
+
+    return isCategoryMatch && isTransactionMatch;
+  });
 
   // const filteredRecords = records.filter((record) => {
   //   if (tranType === "all") return true;
@@ -92,6 +98,7 @@ const RecordsPage = () => {
 
   useEffect(() => {
     fetchRecords();
+    console.log(cateType);
   }, [tranType, cateType]);
 
   return (
@@ -324,42 +331,44 @@ const RecordsPage = () => {
           </div>
           <div className="w-full flex flex-col gap-3">
             <div>Today</div>
-            {records?.map((record, index) => {
-              return (
-                <div
-                  key={index}
-                  className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between"
-                >
-                  <div className="flex items-center gap-3">
-                    <div>
-                      {categories.map((category) => {
-                        if (category.id === record.category_id) {
-                          return (
-                            <span key={category.id}>
-                              {category.category_icon}
-                            </span>
-                          );
-                        }
-                        return null;
-                      })}
-                    </div>
-                    <div>{record.description}</div>
-                  </div>
+            {cateType.length > 0
+              ? filteredRecords
+              : records?.map((record, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div>
+                          {categories.map((category) => {
+                            if (category.id === record.category_id) {
+                              return (
+                                <span key={category.id}>
+                                  {category.category_icon}
+                                </span>
+                              );
+                            }
+                            return null;
+                          })}
+                        </div>
+                        <div>{record.description}</div>
+                      </div>
 
-                  <div
-                    className={`${
-                      record.transaction_type == "EXP"
-                        ? "text-error"
-                        : "text-success"
-                    }`}
-                  >
-                    {" "}
-                    {record.transaction_type == "EXP" ? "-" : "+"}
-                    {record.amount}
-                  </div>
-                </div>
-              );
-            })}
+                      <div
+                        className={`${
+                          record.transaction_type == "EXP"
+                            ? "text-error"
+                            : "text-success"
+                        }`}
+                      >
+                        {" "}
+                        {record.transaction_type == "EXP" ? "-" : "+"}
+                        {record.amount}
+                      </div>
+                    </div>
+                  );
+                })}
           </div>
           <div className="w-full flex flex-col gap-3">
             <div>
