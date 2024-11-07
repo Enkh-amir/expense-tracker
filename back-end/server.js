@@ -83,29 +83,15 @@ app.post("/records", async (req, res) => {
 });
 
 app.get("/records", async (req, response) => {
-  const { category, type } = req.query;
+  const { type } = req.query;
 
   let sqlQuery;
 
-  const categoryArray = category ? JSON.parse(category) : [];
-
-  console.log(`${categoryArray}`);
-
   try {
-    if (type !== "all" && categoryArray.length > 0) {
-      sqlQuery = sql`
-        SELECT * FROM records
-        WHERE transaction_type = ${type} AND category_id IN (${categoryArray});
-      `;
-    } else if (type !== "all") {
+    if (type !== "all") {
       sqlQuery = sql`
         SELECT * FROM records
         WHERE transaction_type = ${type};
-      `;
-    } else if (categoryArray.length > 0) {
-      sqlQuery = sql`
-        SELECT * FROM records
-        WHERE category_id IN (${categoryArray});
       `;
     } else {
       sqlQuery = sql`SELECT * FROM records`;
@@ -114,6 +100,7 @@ app.get("/records", async (req, response) => {
     const sqlResponse = await sqlQuery;
     response.json({ data: sqlResponse, success: true });
   } catch (error) {
+    // console.log(error);
     response.json({ error: error.message, success: false });
   }
 });
