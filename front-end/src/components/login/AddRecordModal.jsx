@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BACKEND_ENDPOINT } from "@/constants/constant";
 
-const AddRecordModal = ({ categories }) => {
+const AddRecordModal = ({ categories, userId }) => {
   const [transactionType, setTransactionType] = useState("EXP");
+  const [dateInput, setDateInput] = useState(""); // Initialize as empty
+  const [timeInput, setTimeInput] = useState(""); // Initialize as empty
   const [records, setRecords] = useState({
     name: "",
+    user_id: userId,
     amount: "",
     transaction_type: transactionType,
     description: "",
@@ -19,20 +22,27 @@ const AddRecordModal = ({ categories }) => {
 
   const handleDateChange = (e) => {
     const newDate = e.target.value;
-    const timePart = records.createdat.split("T")[1]; // Get existing time
-    setRecords((prevRecords) => ({
-      ...prevRecords,
-      createdat: `${newDate}T${timePart}`,
-    }));
+    setDateInput(newDate);
+    console.log(dateInput);
+    if (newDate && timeInput) {
+      setRecords((prevRecords) => ({
+        ...prevRecords,
+        createdat: `${newDate}T${timeInput}`,
+      }));
+    }
   };
 
   const handleTimeChange = (e) => {
     const newTime = e.target.value;
-    const datePart = records.createdat.split("T")[0]; // Get existing date
-    setRecords((prevRecords) => ({
-      ...prevRecords,
-      createdat: `${datePart}T${newTime}`,
-    }));
+    setTimeInput(newTime);
+    console.log(timeInput);
+    // Only set `createdat` when both date and time are provided
+    if (dateInput && newTime) {
+      setRecords((prevRecords) => ({
+        ...prevRecords,
+        createdat: `${dateInput}T${newTime}`,
+      }));
+    }
   };
 
   const toggleTransactionType = (type) => {
@@ -64,7 +74,7 @@ const AddRecordModal = ({ categories }) => {
         transaction_type: transactionType,
         category_id: "",
         description: "",
-        createdat: new Date().toISOString(),
+        createdat: "",
       });
     } catch (error) {
       console.error("Error adding record:", error);
@@ -149,7 +159,7 @@ const AddRecordModal = ({ categories }) => {
             <label className="block">Date</label>
             <input
               type="date"
-              value={records.createdat.split("T")[0] || ""}
+              value={dateInput}
               onChange={handleDateChange}
               className="input input-bordered w-full"
             />
@@ -158,7 +168,7 @@ const AddRecordModal = ({ categories }) => {
             <label className="block">Time</label>
             <input
               type="time"
-              value={records.createdat.split("T")[1].split(".")[0] || ""}
+              value={timeInput}
               onChange={handleTimeChange}
               className="input input-bordered w-full"
             />

@@ -34,13 +34,16 @@ const Login = () => {
         });
 
         const data = await response.json();
-        console.log("email", email.value);
-        console.log("pass", password.value);
+        console.log("email", values.email);
         console.log("data", data);
 
         if (response.ok) {
           toast.success("Login successful!");
+
+          // Store user_id and token (if available) in localStorage
           localStorage.setItem("isLoggedIn", "true");
+          localStorage.setItem("user_id", data?.user.id); // Assuming user_id is returned in the response
+
           router.push("/dashboard");
         } else {
           setErrorMessage(data.message || "Invalid credentials");
@@ -54,7 +57,7 @@ const Login = () => {
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     if (isLoggedIn) {
-      toast.success("you already login");
+      toast.success("You are already logged in");
       router.push("/dashboard");
     }
   }, [router]);
@@ -124,7 +127,7 @@ const Login = () => {
             </button>
           </form>
           <div className="flex justify-center items-center py-3 w-full gap-3">
-            <p>Dont have an Account?</p>
+            <p>Don't have an Account?</p>
             <Link href="/sign-up">
               <button className="btn btn-link text-white p-2 rounded-md w-full">
                 Sign Up
@@ -137,4 +140,5 @@ const Login = () => {
     </div>
   );
 };
+
 export default Login;

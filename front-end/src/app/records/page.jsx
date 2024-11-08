@@ -5,6 +5,8 @@ import ExpenseLogo from "../../../public/assets/ExpenseLogo";
 import Link from "next/link";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import AddRecordModal from "@/components/login/AddRecordModal";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const RecordsPage = () => {
   const [categoryName, setCategoryName] = useState("");
@@ -14,6 +16,8 @@ const RecordsPage = () => {
   const [records, setRecords] = useState([]);
   const [tranType, setTranType] = useState("all");
   const [cateType, setCateType] = useState([]);
+  const [userId, setUserId] = useState(null);
+  const router = useRouter();
 
   const toggleCheckbox = (event) => {
     const value = event.target.value;
@@ -22,6 +26,18 @@ const RecordsPage = () => {
     } else {
       setCateType((prev) => prev.filter((item) => item !== value));
     }
+  };
+
+  const handleLogout = () => {
+    // Clear local storage or session storage (depending on where your auth data is stored)
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("user_id"); // or other data related to user login
+
+    // Show success toast
+    toast.success("You have logged out successfully.");
+
+    // Redirect the user to the login page
+    router.push("/");
   };
 
   const fetchRecords = async () => {
@@ -92,13 +108,82 @@ const RecordsPage = () => {
     }
   };
 
+  // Get start of today
+  const getTodayRange = () => {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0); // Midnight today
+    const end = new Date(); // Current time
+    return { start, end };
+  };
+
+  // Get start and end of yesterday
+  const getYesterdayRange = () => {
+    const end = new Date();
+    end.setHours(0, 0, 0, 0); // Midnight today
+    const start = new Date(end);
+    start.setDate(start.getDate() - 1); // Yesterday's date
+    return { start, end };
+  };
+
+  // Get start and end of last week (Sunday to Saturday)
+  const getLastWeekRange = () => {
+    const now = new Date();
+    const end = new Date(now);
+    end.setDate(end.getDate() - now.getDay()); // Last Saturday
+    end.setHours(23, 59, 59, 999); // End of last Saturday
+    const start = new Date(end);
+    start.setDate(start.getDate() - 6); // Start of last week (Sunday)
+    start.setHours(0, 0, 0, 0); // Start of last Sunday
+    return { start, end };
+  };
+
+  const getLastMonthRange = () => {
+    const now = new Date();
+    const end = new Date(now);
+    end.setDate(end.getDate() - now.getDay());
+    end.setHours(23, 59, 59, 999);
+    const start = new Date(end);
+    start.setDate(start.getDate() - 30);
+    start.setHours(0, 0, 0, 0);
+    return { start, end };
+  };
+
+  const filterByDateRange = (records, { start, end }) => {
+    return records.filter((record) => {
+      const recordDate = new Date(record.createdat);
+      return recordDate >= start && recordDate <= end;
+    });
+  };
+
+  // Define each group
+  const todayRecords = filterByDateRange(filteredRecords, getTodayRange());
+  const yesterdayRecords = filterByDateRange(
+    filteredRecords,
+    getYesterdayRange()
+  );
+  const lastWeekRecords = filterByDateRange(
+    filteredRecords,
+    getLastWeekRange()
+  );
+
+  const lastMonthRecords = filterByDateRange(
+    filteredRecords,
+    getLastMonthRange()
+  );
+
+  useEffect(() => {
+    // Retrieve user data from localStorage when the component mounts
+    const storedUser = localStorage.getItem("user_id");
+    setUserId(storedUser); // Set the user state with the retrieved data
+    console.log(userId);
+  }, []);
+
   useEffect(() => {
     fetchCategories();
   }, []);
 
   useEffect(() => {
     fetchRecords();
-    console.log(cateType);
   }, [tranType, cateType]);
 
   return (
@@ -124,9 +209,12 @@ const RecordsPage = () => {
 
             <dialog id="my_modal_3" className="modal">
               <div className="modal-box">
-                <AddRecordModal categories={categories} />
+                <AddRecordModal categories={categories} userId={userId} />
               </div>
             </dialog>
+            <button className="btn btn-primary" onClick={handleLogout}>
+              Log Out
+            </button>
             <div className="avatar">
               <div className="w-14 rounded-full">
                 <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
@@ -300,6 +388,7 @@ const RecordsPage = () => {
             </dialog>
           </div>
         </div>
+
         <div className="w-[75%] flex flex-col gap-5">
           <div className="w-full flex justify-between">
             <div className="flex gap-3">
@@ -329,60 +418,164 @@ const RecordsPage = () => {
               </ul>
             </div>
           </div>
-          <div className="w-full flex flex-col gap-3">
-            <div>Today</div>
-            {cateType.length > 0
-              ? filteredRecords
-              : records?.map((record, index) => {
-                  return (
-                    <div
-                      key={index}
-                      className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div>
-                          {categories.map((category) => {
-                            if (category.id === record.category_id) {
-                              return (
-                                <span key={category.id}>
-                                  {category.category_icon}
-                                </span>
-                              );
-                            }
-                            return null;
-                          })}
-                        </div>
-                        <div>{record.description}</div>
-                      </div>
 
-                      <div
-                        className={`${
-                          record.transaction_type == "EXP"
-                            ? "text-error"
-                            : "text-success"
-                        }`}
-                      >
-                        {" "}
-                        {record.transaction_type == "EXP" ? "-" : "+"}
-                        {record.amount}
-                      </div>
+          {todayRecords.length > 0 ? (
+            todayRecords.map((record, index) => (
+              <div key={index} className="w-full flex flex-col gap-3">
+                <h2>Today</h2>
+                <div
+                  key={index}
+                  className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <div>
+                      {categories.map((category) => {
+                        if (category.id === record.category_id) {
+                          return (
+                            <span key={category.id}>
+                              {category.category_icon}
+                            </span>
+                          );
+                        }
+                        return null;
+                      })}
                     </div>
-                  );
-                })}
-          </div>
-          <div className="w-full flex flex-col gap-3">
-            <div>
-              <div>Yesterday</div>
-              <div className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <i className="fa-solid fa-house"></i>
-                  <div>Electricity</div>
+                    <div>{record.description}</div>
+                  </div>
+
+                  <div
+                    className={`${
+                      record.transaction_type == "EXP"
+                        ? "text-error"
+                        : "text-success"
+                    }`}
+                  >
+                    {record.transaction_type == "EXP" ? "-" : "+"}
+                    {record.amount}
+                  </div>
                 </div>
-                <div>+1000</div>
               </div>
-            </div>
-            <div></div>
-          </div>
+            ))
+          ) : (
+            <p>No records for today.</p>
+          )}
+
+          {yesterdayRecords.length > 0
+            ? yesterdayRecords.map((record, index) => (
+                <div key={index}>
+                  <h2>Yesterday</h2>
+                  <div
+                    key={index}
+                    className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div>
+                        {categories.map((category) => {
+                          if (category.id === record.category_id) {
+                            return (
+                              <span key={category.id}>
+                                {category.category_icon}
+                              </span>
+                            );
+                          }
+                          return null;
+                        })}
+                      </div>
+                      <div>{record.description}</div>
+                    </div>
+
+                    <div
+                      className={`${
+                        record.transaction_type == "EXP"
+                          ? "text-error"
+                          : "text-success"
+                      }`}
+                    >
+                      {record.transaction_type == "EXP" ? "-" : "+"}
+                      {record.amount}
+                    </div>
+                  </div>
+                </div>
+              ))
+            : null}
+
+          {lastWeekRecords.length > 0
+            ? lastWeekRecords.map((record, index) => (
+                <div key={index}>
+                  <h2>Last Week</h2>
+                  <div
+                    key={index}
+                    className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div>
+                        {categories.map((category) => {
+                          if (category.id === record.category_id) {
+                            return (
+                              <span key={category.id}>
+                                {category.category_icon}
+                              </span>
+                            );
+                          }
+                          return null;
+                        })}
+                      </div>
+                      <div>{record.description}</div>
+                    </div>
+
+                    <div
+                      className={`${
+                        record.transaction_type == "EXP"
+                          ? "text-error"
+                          : "text-success"
+                      }`}
+                    >
+                      {record.transaction_type == "EXP" ? "-" : "+"}
+                      {record.amount}
+                    </div>
+                  </div>
+                </div>
+              ))
+            : null}
+
+          {lastMonthRecords.length > 0
+            ? lastMonthRecords.map((record, index) => (
+                <div key={index}>
+                  <h2>Last month</h2>
+                  <div
+                    key={index}
+                    className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div>
+                        {categories.map((category) => {
+                          if (category.id === record.category_id) {
+                            return (
+                              <span key={category.id}>
+                                {category.category_icon}
+                              </span>
+                            );
+                          }
+                          return null;
+                        })}
+                      </div>
+                      <div>{record.description}</div>
+                    </div>
+
+                    <div
+                      className={`${
+                        record.transaction_type == "EXP"
+                          ? "text-error"
+                          : "text-success"
+                      }`}
+                    >
+                      {record.transaction_type == "EXP" ? "-" : "+"}
+                      {record.amount}
+                    </div>
+                  </div>
+                </div>
+              ))
+            : null}
         </div>
       </main>
     </div>
