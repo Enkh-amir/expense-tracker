@@ -7,6 +7,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import AddRecordModal from "@/components/login/AddRecordModal";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { BACKEND_ENDPOINT } from "@/constants/constant";
 
 const RecordsPage = () => {
   const [categoryName, setCategoryName] = useState("");
@@ -42,7 +43,7 @@ const RecordsPage = () => {
 
   const fetchRecords = async () => {
     try {
-      let url = `http://localhost:8888/records?category=${JSON.stringify(
+      let url = `${BACKEND_ENDPOINT}/records?category=${JSON.stringify(
         cateType
       )}&type=${tranType}`;
 
@@ -56,7 +57,7 @@ const RecordsPage = () => {
 
   const fetchCategories = async () => {
     try {
-      const respone = await fetch(`http://localhost:8888/categories`);
+      const respone = await fetch(`${BACKEND_ENDPOINT}/categories`);
       const responseData = await respone.json();
       setCategories(responseData.data);
     } catch (error) {
@@ -91,7 +92,7 @@ const RecordsPage = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:8888/categories", {
+      const response = await fetch(`${BACKEND_ENDPOINT}/categories`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newCategory),

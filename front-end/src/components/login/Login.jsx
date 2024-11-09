@@ -25,7 +25,7 @@ const Login = () => {
     onSubmit: async (values) => {
       setErrorMessage("");
       try {
-        const response = await fetch("http://localhost:8888", {
+        const response = await fetch(`${BACKEND_ENDPOINT}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
