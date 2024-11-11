@@ -11,6 +11,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.6.0",
     "chart.js": "^4.4.5",
+    "dotenv": "^16.4.5",
     "formik": "^2.4.6",
     "next": "15.0.0",
     "react": "^18.3.1",

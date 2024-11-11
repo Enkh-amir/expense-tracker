@@ -25,7 +25,7 @@ const Login = () => {
     onSubmit: async (values) => {
       setErrorMessage("");
       try {
-        const response = await fetch(`${BACKEND_ENDPOINT}`, {
+        const response = await fetch(process.env.NEXT_PUBLIC_BACKEND_ENDPOINT, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -39,11 +39,8 @@ const Login = () => {
 
         if (response.ok) {
           toast.success("Login successful!");
-
-          // Store user_id and token (if available) in localStorage
           localStorage.setItem("isLoggedIn", "true");
-          localStorage.setItem("user_id", data?.user.id); // Assuming user_id is returned in the response
-
+          localStorage.setItem("user_id", data?.user.id);
           router.push("/dashboard");
         } else {
           setErrorMessage(data.message || "Invalid credentials");
