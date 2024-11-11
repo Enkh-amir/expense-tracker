@@ -30,14 +30,11 @@ const RecordsPage = () => {
   };
 
   const handleLogout = () => {
-    // Clear local storage or session storage (depending on where your auth data is stored)
     localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("user_id"); // or other data related to user login
+    localStorage.removeItem("user_id"); 
 
-    // Show success toast
     toast.success("You have logged out successfully.");
 
-    // Redirect the user to the login page
     router.push("/");
   };
 
@@ -65,7 +62,6 @@ const RecordsPage = () => {
     }
   };
 
-  // Combined filtering of records based on both category and transaction type
   const filteredRecords = records.filter((record) => {
     const isCategoryMatch =
       cateType.length === 0 || cateType.includes(record.category_id);
@@ -74,14 +70,6 @@ const RecordsPage = () => {
 
     return isCategoryMatch && isTransactionMatch;
   });
-
-  // const filteredRecords = records.filter((record) => {
-  //   if (tranType === "all") return true;
-  //   return (
-  //     record.transaction_type === tranType &&
-  //     (record.category_id == cateType || cateType == "all")
-  //   );
-  // });
 
   const handleForSubmit = async (e) => {
     e.preventDefault();
@@ -99,7 +87,6 @@ const RecordsPage = () => {
       });
       console.log(newCategory);
       if (response.ok) {
-        // Reset fields after successful submission
         setCategoryName("");
         setIcon("");
         setDescription("");
@@ -109,11 +96,10 @@ const RecordsPage = () => {
     }
   };
 
-  // Get start of today
   const getTodayRange = () => {
     const start = new Date();
-    start.setHours(0, 0, 0, 0); // Midnight today
-    const end = new Date(); // Current time
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(); 
     return { start, end };
   };
 
