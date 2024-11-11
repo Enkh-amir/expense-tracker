@@ -54,7 +54,7 @@ const AddRecordModal = ({ categories, userId }) => {
     event.preventDefault();
 
     try {
-      const response = await fetch(`${BACKEND_ENDPOINT}/records`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_ENDPOINT}/records`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

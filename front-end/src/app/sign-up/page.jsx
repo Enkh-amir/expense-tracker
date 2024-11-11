@@ -32,7 +32,7 @@ const SignUp = () => {
       setErrorMessage("");
       const { confirmPassword, ...filteredValues } = values; // Exclude confirmPassword
       try {
-        const response = await fetch(`${BACKEND_ENDPOINT}/sign-up`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_ENDPOINT}/sign-up`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

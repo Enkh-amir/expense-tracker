@@ -40,7 +40,7 @@ const RecordsPage = () => {
 
   const fetchRecords = async () => {
     try {
-      let url = `${BACKEND_ENDPOINT}/records?category=${JSON.stringify(
+      let url = `${process.env.NEXT_PUBLIC_BACKEND_ENDPOINT}/records?category=${JSON.stringify(
         cateType
       )}&type=${tranType}`;
 
@@ -54,7 +54,7 @@ const RecordsPage = () => {
 
   const fetchCategories = async () => {
     try {
-      const respone = await fetch(`${BACKEND_ENDPOINT}/categories`);
+      const respone = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_ENDPOINT}/categories`);
       const responseData = await respone.json();
       setCategories(responseData.data);
     } catch (error) {
@@ -80,7 +80,7 @@ const RecordsPage = () => {
     };
 
     try {
-      const response = await fetch(`${BACKEND_ENDPOINT}/categories`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_ENDPOINT}/categories`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newCategory),
