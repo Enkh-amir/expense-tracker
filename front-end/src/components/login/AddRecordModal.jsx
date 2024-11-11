@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 
 const AddRecordModal = ({ categories, userId }) => {
   const [transactionType, setTransactionType] = useState("EXP");
-  const [dateInput, setDateInput] = useState(""); // Initialize as empty
-  const [timeInput, setTimeInput] = useState(""); // Initialize as empty
+  const [dateInput, setDateInput] = useState(""); 
+  const [timeInput, setTimeInput] = useState(""); 
   const [records, setRecords] = useState({
     name: "",
     user_id: userId,
@@ -53,7 +53,7 @@ const AddRecordModal = ({ categories, userId }) => {
     event.preventDefault();
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_ENDPOINT}/records`, {
+      const response = await fetch(`https://expense-tracker-1-38mj.onrender.com/records`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

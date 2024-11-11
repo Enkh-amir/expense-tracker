@@ -30,7 +30,7 @@ const RecordsPage = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("user_id"); 
+    localStorage.removeItem("user_id");
 
     toast.success("You have logged out successfully.");
 
@@ -39,7 +39,7 @@ const RecordsPage = () => {
 
   const fetchRecords = async () => {
     try {
-      let url = `${process.env.NEXT_PUBLIC_BACKEND_ENDPOINT}/records?category=${JSON.stringify(
+      let url = `https://expense-tracker-1-38mj.onrender.com/records?category=${JSON.stringify(
         cateType
       )}&type=${tranType}`;
 
@@ -53,7 +53,9 @@ const RecordsPage = () => {
 
   const fetchCategories = async () => {
     try {
-      const respone = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_ENDPOINT}/categories`);
+      const respone = await fetch(
+        `https://expense-tracker-1-38mj.onrender.com/categories`
+      );
       const responseData = await respone.json();
       setCategories(responseData.data);
     } catch (error) {
@@ -79,11 +81,14 @@ const RecordsPage = () => {
     };
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_ENDPOINT}/categories`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newCategory),
-      });
+      const response = await fetch(
+        `https://expense-tracker-1-38mj.onrender.com/categories`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newCategory),
+        }
+      );
       console.log(newCategory);
       if (response.ok) {
         setCategoryName("");
@@ -98,7 +103,7 @@ const RecordsPage = () => {
   const getTodayRange = () => {
     const start = new Date();
     start.setHours(0, 0, 0, 0);
-    const end = new Date(); 
+    const end = new Date();
     return { start, end };
   };
 
@@ -404,11 +409,10 @@ const RecordsPage = () => {
               </ul>
             </div>
           </div>
-
+          <h2>Today</h2>
           {todayRecords.length > 0 ? (
             todayRecords.map((record, index) => (
               <div key={index} className="w-full flex flex-col gap-3">
-                <h2>Today</h2>
                 <div
                   key={index}
                   className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between"
@@ -445,11 +449,10 @@ const RecordsPage = () => {
           ) : (
             <p>No records for today.</p>
           )}
-
+          <h2>Yesterday</h2>
           {yesterdayRecords.length > 0
             ? yesterdayRecords.map((record, index) => (
                 <div key={index}>
-                  <h2>Yesterday</h2>
                   <div
                     key={index}
                     className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between"
@@ -484,11 +487,10 @@ const RecordsPage = () => {
                 </div>
               ))
             : null}
-
+          <h2>Last Week</h2>
           {lastWeekRecords.length > 0
             ? lastWeekRecords.map((record, index) => (
                 <div key={index}>
-                  <h2>Last Week</h2>
                   <div
                     key={index}
                     className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between"
@@ -523,11 +525,10 @@ const RecordsPage = () => {
                 </div>
               ))
             : null}
-
+          <h2>Last month</h2>
           {lastMonthRecords.length > 0
             ? lastMonthRecords.map((record, index) => (
                 <div key={index}>
-                  <h2>Last month</h2>
                   <div
                     key={index}
                     className="card w-full bg-base-200 border-[1px] border-base-300 px-5 py-4 flex-row items-center justify-between"

@@ -32,13 +32,16 @@ const SignUp = () => {
       setErrorMessage("");
       const { confirmPassword, ...filteredValues } = values; // Exclude confirmPassword
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_ENDPOINT}/sign-up`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(filteredValues),
-        });
+        const response = await fetch(
+          `https://expense-tracker-1-38mj.onrender.com/sign-up`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(filteredValues),
+          }
+        );
         const data = await response.json();
         if (response.ok) {
           router.push("/");

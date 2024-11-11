@@ -25,7 +25,7 @@ const Login = () => {
     onSubmit: async (values) => {
       setErrorMessage("");
       try {
-        const response = await fetch(process.env.NEXT_PUBLIC_BACKEND_ENDPOINT, {
+        const response = await fetch("https://expense-tracker-1-38mj.onrender.com", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
