@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { BACKEND_ENDPOINT } from "@/constants/constant";
 
 const AddRecordModal = ({ categories, userId }) => {
   const [transactionType, setTransactionType] = useState("EXP");

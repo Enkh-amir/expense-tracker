@@ -7,7 +7,6 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import AddRecordModal from "@/components/login/AddRecordModal";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { BACKEND_ENDPOINT } from "@/constants/constant";
 
 const RecordsPage = () => {
   const [categoryName, setCategoryName] = useState("");
